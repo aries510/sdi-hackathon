@@ -46,8 +46,8 @@ coneMesh.position.z = 0.2;
 subwooferGroup.add(coneMesh);
 
 const surroundGeometry = new THREE.TorusGeometry(
-                                1.05,
-                                0.25,
+                                1.6,
+                                0.3,
                                 16,
                                 100
 );
@@ -60,7 +60,7 @@ const surroundMaterial = new THREE.MeshStandardMaterial({
 
 const surroundMesh = new THREE.Mesh(surroundGeometry, surroundMaterial);
 surroundMesh.rotation.x = Math.PI / 2;
-surroundMesh.position.z = 0.1;
+surroundMesh.position.z = 0.5;
 subwooferGroup.add(surroundMesh);
 
 const frameGeometry = new THREE.CylinderGeometry(
@@ -79,7 +79,7 @@ const frameMaterial = new THREE.MeshStandardMaterial({
 const frameMesh = new THREE.Mesh(frameGeometry, frameMaterial);
 frameMesh.position.z = 0.35;
 subwooferGroup.add(frameMesh);
-subwooferGroup.position.set(0, -0.5, 0);
+subwooferGroup.position.set(0, -1.5, 0);
 subwooferGroup.rotation.x = Math.PI / 2;
 
 coneMesh.castShadow = true;
@@ -120,7 +120,41 @@ for(let i = 0; i < numberOfBars; i++) {
   eqGroup.add(barMesh)
 };
 
-eqGroup.position.set(0, 0.5, 0);
+eqGroup.position.set(0, 0, 0);
+
+const tweeterGroup = new THREE.Group();
+scene.add(tweeterGroup);
+
+const tweeterRadius = 0.25;
+const tweeterSpacing = 1.2;
+
+const tweeterMaterial = new THREE.MeshStandardMaterial({
+                                color: 0x999999,
+                                roughness: 0.3,
+                                metalness: 0.8
+});
+
+const leftTweeterGeometry = new THREE.SphereGeometry(
+                                    tweeterRadius,
+                                    32,
+                                    32
+);
+
+const leftTweeter = new THREE.Mesh(leftTweeterGeometry, tweeterMaterial);
+leftTweeter.position.set(-tweeterSpacing,  0.5, 0.2);
+tweeterGroup.add(leftTweeter);
+
+const rightTweeterGeometry = new THREE.SphereGeometry(
+                                    tweeterRadius,
+                                    32,
+                                    32
+);
+
+const rightTweeter = new THREE.Mesh(rightTweeterGeometry, tweeterMaterial);
+rightTweeter.position.set(tweeterSpacing, 0.5, 0.2);
+tweeterGroup.add(rightTweeter);
+leftTweeter.castShadow = true;
+rightTweeter.castShadow = true;
 
 // const geometry = new THREE.BoxGeometry(1, 1, 1);
 // const material = new THREE.MeshStandardMaterial( {
@@ -136,16 +170,48 @@ function animate() {
 
   const bassLevel = Math.abs(Math.sin(Date.now() * 0.002));
   coneMesh.scale.set(
-      1 + bassLevel * 0.3,
-      1 + bassLevel * 0.3,
-      1 + bassLevel * 0.3
+      1 + bassLevel * 0.2,
+      1 + bassLevel * 0.2,
+      1 + bassLevel * 0.2
   );
   coneMesh.position.z = 0.2 + bassLevel * 0.15;
+  // const bassColor = new THREE.Color(
+  //   0.3 + bassLevel * 0.7,
+  //   0.1 + bassLevel * 0.2,
+  //   0.1 + bassLevel * 0.2
+  // );
+  // pointLight.color = bassColor;
+  // ambientLight.intensity = 0.5 + midslevel * 0.5;
+  // pointLight.intensity = 1.2 + highLevel * 0.8;
 
+ 
+  eqGroup.children.forEach((bar, index) => {
+    const variation = Math.sin(Date.now() * 0.003 + index * 0.3);
+    const midslevel = Math.abs(Math.sin(Date.now() * 0.004));
+    const minHeight = 1.5;
+    const maxHeight = 2.25;
+    let finalScale = minHeight + (midslevel + variation) * 1.5;
+    finalScale = Math.min(finalScale, maxHeight)
+    bar.scale.y = finalScale;
+    bar.position.y = 1.2 + (finalScale * 0.5);
+  });
+
+  const highLevel = Math.abs(Math.sin(Date.now() * 0.01));
+  tweeterGroup.children.forEach((tweeter, index) => {
+    const variation = Math.sin(Date.now() * 0.02 + index);
+    const shimmer = 1 + (highLevel * 0.05) + (variation * 0.03);
+    tweeter.scale.set(shimmer, shimmer, shimmer);
+    tweeter.material.emissiveIntensity= highLevel * 0.5;
+  })
 
 
   // cube.rotation.x += 0.01;
   // cube.rotation.y +=0.01;
+
+  // const time = Date.now() * 0.0003;
+  // camera.position.x = Math.sin(time) * 5;
+  // camera.position.z = Math.cos(time) * 5;
+  // camera.lookAt(0, 0, 0)
 
   renderer.render(scene, camera);
 }
