@@ -12,13 +12,14 @@ camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x333333);
 document.body.appendChild( renderer.domElement );
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambientLight);
 
 const pointLight = new THREE.PointLight(0xffffff, 1.2);
-pointLight.position.set(5, 5, 5);
+pointLight.position.set(2, 2, 3);
 scene.add(pointLight);
 // SCENE SET UP
 
@@ -33,31 +34,33 @@ const coneGeometry = new THREE.SphereGeometry(
 );
 
 const coneMaterial = new THREE.MeshStandardMaterial({
-                            color: 0x111111,
+                            color: 0x555555,
                             roughness: 0.7,
                             metalness: 0.2,
                             emissive: 0x000000
 });
 
 const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
+coneMesh.scale.set(0.95, 0.95, 0.95)
 coneMesh.position.z = 0.2;
 subwooferGroup.add(coneMesh);
 
 const surroundGeometry = new THREE.TorusGeometry(
-                                1.2,
-                                0.15,
+                                1.05,
+                                0.25,
                                 16,
                                 100
 );
 
 const surroundMaterial = new THREE.MeshStandardMaterial({
-                                color: 0x222222,
+                                color: 0x555555,
                                 roughness: 0.9,
                                 metalness: 0.1
 })
 
 const surroundMesh = new THREE.Mesh(surroundGeometry, surroundMaterial);
 surroundMesh.rotation.x = Math.PI / 2;
+surroundMesh.position.z = 0.1;
 subwooferGroup.add(surroundMesh);
 
 const frameGeometry = new THREE.CylinderGeometry(
@@ -68,15 +71,16 @@ const frameGeometry = new THREE.CylinderGeometry(
 );
 
 const frameMaterial = new THREE.MeshStandardMaterial({
-                              color: 0x333333,
+                              color: 0x777777,
                               roughness: 0.4,
                               metalness: 0.8
 });
 
 const frameMesh = new THREE.Mesh(frameGeometry, frameMaterial);
-frameMesh.position.z = -0.3;
+frameMesh.position.z = 0.35;
 subwooferGroup.add(frameMesh);
 subwooferGroup.position.set(0, -0.5, 0);
+subwooferGroup.rotation.x = Math.PI / 2;
 
 coneMesh.castShadow = true;
 surroundMesh.castShadow = true;
@@ -149,10 +153,11 @@ function animate() {
 animate();
 
 window.addEventListener('resize', () => {
-  camera.aspec = window.innerWidth / window.innerHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
   renderer.setSize(window.innerWidth, window.innerHeight);
+  
 });
 
 export default animate
